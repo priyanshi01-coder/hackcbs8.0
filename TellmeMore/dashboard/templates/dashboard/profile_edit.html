@@ -1,0 +1,130 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Edit Profile{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Custom styles to ensure theme consistency and good contrast */
+
+    /* Glow effect for inputs (using the theme's primary accent color) */
+    .glow-input:focus {
+        box-shadow: 0 0 0 3px var(--color-accent-primary), 0 0 8px var(--color-shadow);
+        border-color: var(--color-accent-primary);
+        transition: all 0.3s ease-in-out;
+    }
+
+    /* --- LIGHT MODE Input Styles (Default - High Contrast) --- */
+
+    /* Enabled/Editable fields (all form fields) */
+    .profile-input-bg {
+        /* Use the light accent background for contrast in Light Mode */
+        background-color: var(--color-accent-light); /* #EDE9FE */
+        border-color: var(--color-border-primary); 
+        color: var(--color-text-primary);
+        font-weight: 500;
+        /* Custom text color for placeholder is needed for the file input */
+        color: var(--color-text-primary); 
+    }
+
+    /* Disabled/Read-only fields (Username) */
+    .read-only-input {
+        /* Use the tertiary background for contrast in Light Mode */
+        background-color: var(--color-bg-tertiary); /* #F3F0FF */
+        border-color: var(--color-border-secondary); 
+        color: var(--color-text-secondary); /* Muted text color */
+        font-weight: 500;
+    }
+
+    /* --- DARK MODE Overrides for Blending/Contrast FIX --- */
+
+    .dark .profile-input-bg {
+        /* In DARK mode: Use the distinct darker tertiary color (#334155) */
+        background-color: var(--color-bg-tertiary); 
+        border-color: var(--color-border-secondary);
+        color: var(--color-text-primary);
+    }
+    
+    .dark .read-only-input {
+        /* In DARK mode: Use the primary color (#0F172A) for the disabled field */
+        background-color: var(--color-bg-primary); 
+        border-color: var(--color-border-primary);
+        color: var(--color-text-secondary);
+    }
+
+    /* Custom style for the file input to ensure text color is readable */
+    input[type="file"] {
+        color: var(--color-text-primary); /* Ensure file input text is visible */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center px-6 py-12">
+    <div class="w-full max-w-5xl glass rounded-3xl p-8 md:p-12">
+
+        <h2 class="text-3xl md:text-4xl font-extrabold text-[var(--color-text-primary)] mb-8 text-center">Edit Profile</h2>
+
+        <form method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-6 text-[var(--color-text-primary)]">
+            {% csrf_token %}
+
+            <div>
+                <label class="block font-semibold mb-2 text-[var(--color-text-secondary)]">First Name</label>
+                <input type="text" name="first_name" value="{{ user.first_name }}" 
+                        class="w-full p-4 rounded-xl profile-input-bg glow-input focus:outline-none placeholder-[var(--color-text-muted)]">
+            </div>
+            <div>
+                <label class="block font-semibold mb-2 text-[var(--color-text-secondary)]">Last Name</label>
+                <input type="text" name="last_name" value="{{ user.last_name }}" 
+                        class="w-full p-4 rounded-xl profile-input-bg glow-input focus:outline-none placeholder-[var(--color-text-muted)]">
+            </div>
+            <div>
+                <label class="block font-semibold mb-2 text-[var(--color-text-secondary)]">Email</label>
+                <input type="email" name="email" value="{{ user.email }}" 
+                        class="w-full p-4 rounded-xl profile-input-bg glow-input focus:outline-none placeholder-[var(--color-text-muted)]">
+            </div>
+            <div>
+                <label class="block font-semibold mb-2 text-[var(--color-text-secondary)]">Username</label>
+                <input type="text" value="{{ user.username }}" disabled 
+                        class="w-full p-4 rounded-xl read-only-input focus:outline-none">
+            </div>
+
+            <div>
+                <label class="block font-semibold mb-2 text-[var(--color-text-secondary)]">Gender</label>
+                <select name="gender" class="w-full p-4 rounded-xl profile-input-bg glow-input focus:outline-none">
+                    <option value="" {% if not profile.gender %}selected{% endif %}>Select</option>
+                    <option value="M" {% if profile.gender == "M" %}selected{% endif %}>Male</option>
+                    <option value="F" {% if profile.gender == "F" %}selected{% endif %}>Female</option>
+                    <option value="O" {% if profile.gender == "O" %}selected{% endif %}>Other</option>
+                </select>
+            </div>
+            <div>
+                <label class="block font-semibold mb-2 text-[var(--color-text-secondary)]">Date of Birth</label>
+                <input type="date" name="dob" value="{{ profile.dob|date:'Y-m-d' }}" 
+                        class="w-full p-4 rounded-xl profile-input-bg glow-input focus:outline-none placeholder-[var(--color-text-muted)]">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block font-semibold mb-2 text-[var(--color-text-secondary)]">Bio</label>
+                <textarea name="bio" class="w-full p-4 rounded-xl profile-input-bg glow-input h-32 resize-none focus:outline-none placeholder-[var(--color-text-muted)]">{{ profile.bio }}</textarea>
+            </div>
+
+            <div class="md:col-span-2">
+                <label class="block font-semibold mb-2 text-[var(--color-text-secondary)]">Profile Picture</label>
+                {% if profile.profile_picture %}
+                    <div class="mb-2">
+                        <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="w-24 h-24 rounded-full border-2 border-[var(--color-accent-light)] object-cover">
+                    </div>
+                {% endif %}
+                <input type="file" name="profile_picture" class="w-full p-4 rounded-xl profile-input-bg focus:outline-none glow-input">
+            </div>
+
+            <div class="md:col-span-2 flex justify-end">
+                <button type="submit" 
+                    class="px-8 py-4 bg-[var(--color-accent-primary)] text-white font-extrabold rounded-full shadow-lg 
+                            hover:bg-[var(--color-accent-hover)] hover:scale-105 transition duration-300 transform tracking-wide text-lg">
+                    Save Changes 
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+{% endblock %}
