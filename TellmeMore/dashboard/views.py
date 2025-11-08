@@ -19,3 +19,4 @@ def uploaded_items(request):
 def analytics(request):
     from dashboard.models import InterviewSession, SessionAnalytics
     from django.db.models import Avg, Count, Max
+    
