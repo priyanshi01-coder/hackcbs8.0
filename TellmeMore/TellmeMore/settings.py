@@ -10,8 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
+from dotenv import load_dotenv
 
+# Load environment variables
+load_dotenv()
+api_key = os.getenv("AIzaSyBGejYVjDAPJUBNBHk_nlyxlzbyAtue-hM")
 
+#==================================================================
 
 from pathlib import Path
 
